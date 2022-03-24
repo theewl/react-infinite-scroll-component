@@ -30,6 +30,7 @@ interface State {
   showLoader: boolean;
   pullToRefreshThresholdBreached: boolean;
   prevDataLength: number | undefined;
+  saved: HTMLElement | null;
 }
 
 export default class InfiniteScroll extends Component<Props, State> {
@@ -40,6 +41,7 @@ export default class InfiniteScroll extends Component<Props, State> {
       showLoader: false,
       pullToRefreshThresholdBreached: false,
       prevDataLength: props.dataLength,
+      saved: null
     };
 
     this.throttledOnScrollListener = throttle(150, this.onScrollListener).bind(
@@ -169,7 +171,7 @@ export default class InfiniteScroll extends Component<Props, State> {
       return this.props.scrollableTarget;
     if (typeof this.props.scrollableTarget === 'string') {
       let moonDiv = document.getElementById('moon-div');
-      return moonDiv.shadowRoot.getElementById(this.props.scrollableTarget);
+      return moonDiv?.shadowRoot?.getElementById(this.props.scrollableTarget);
     }
     if (this.props.scrollableTarget === null) {
       console.warn(`You are trying to pass scrollableTarget but it is null. This might
@@ -302,13 +304,21 @@ export default class InfiniteScroll extends Component<Props, State> {
       // functionality of the library.
       setTimeout(() => this.props.onScroll && this.props.onScroll(event), 0);
     }
-
-    const target =
+    
+    let target: any =
       this.props.height || this._scrollableNode
         ? (event.target as HTMLElement)
         : document.documentElement.scrollTop
         ? document.documentElement
         : document.body;
+
+      if(!target){
+        target = this.state.saved;
+      }else{
+        this.setState({
+          saved: target
+        });
+      }
 
     // return immediately if the action has already been triggered,
     // prevents multiple triggers.
