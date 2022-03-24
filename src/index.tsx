@@ -168,7 +168,8 @@ export default class InfiniteScroll extends Component<Props, State> {
     if (this.props.scrollableTarget instanceof HTMLElement)
       return this.props.scrollableTarget;
     if (typeof this.props.scrollableTarget === 'string') {
-      return document.getElementById(this.props.scrollableTarget);
+      let moonDiv = document.getElementById('moon-div');
+      return moonDiv.shadowRoot.getElementById(this.props.scrollableTarget);
     }
     if (this.props.scrollableTarget === null) {
       console.warn(`You are trying to pass scrollableTarget but it is null. This might
